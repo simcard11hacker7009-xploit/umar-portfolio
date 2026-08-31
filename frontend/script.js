@@ -82,13 +82,15 @@ contactForm.addEventListener("submit", async function (event) {
 
     try {
 
-        const response = await fetch("/api/messages", 
+        const response = await fetch("https://formspree.io/f/meaqeodp", 
             {
                 method: "POST",
 
                 headers: {
-                    "Content-Type": "application/json"
-                },
+                    "Content-Type": "application/json",
+
+ "Accept": "application/json"
+               },
 
                 body: JSON.stringify({
                     name: name,
