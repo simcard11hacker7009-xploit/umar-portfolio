@@ -16,11 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 // Send contact messages to Gmail
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+
     }
 });
 
@@ -64,20 +60,32 @@ app.post("/api/messages", async (req, res) => {
         JSON.stringify(messages, null, 2)
     );
 
-    // Send email
-    try {
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER,
-            replyTo: email,
-            subject: `New Portfolio Message from ${name}`,
-            text: `
-Name: ${name}
+  // Send email using Resend
+try {
+  const resendResponse = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      from: "Portfolio <onboarding@resend.dev>",
+      to: [process.env.EMAIL_USER],
+      reply_to: email,
+      subject: `New Portfolio Message from ${name}`,
+      text: `Name: ${name}
+
 Email: ${email}
 
 Message:
-${message}
-            `
+${message}`
+    })
+  });
+
+  if (!resendResponse.ok) {
+    const errorText = await resendResponse.text();
+    throw new Error(errorText);
+  }
         });
 
         res.json({
