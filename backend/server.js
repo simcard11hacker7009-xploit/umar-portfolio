@@ -15,10 +15,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../frontend")));
 
-// Send contact messages to Gmail
-
-    }
-});
+// Send contact messages with Resend
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const messagesFile = path.join(__dirname, "messages.json");
 
